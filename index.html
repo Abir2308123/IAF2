@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KALĀ-KSHETRA | Interactive Indian Art Map (CO1)</title>
+    <meta name="description" content="Explore India's rich artistic heritage - Ajanta frescoes, Ellora cave temples, Tanjore gold paintings, Khajuraho sculptures, Madhubani folk art, Warli tribal art, Puri Pattachitra, and Jaipur miniatures on an interactive map.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;500;600;700&family=Rozha+One&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dark-theme">
+
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="logo-container">
+            <div class="mandala-icon"><i class="fa-solid fa-dharmachakra"></i></div>
+            <div>
+                <h1 class="app-title">KALĀ-KSHETRA <span class="badge-co1">CO1 Project</span></h1>
+                <p class="app-subtitle">Interactive Indian Art & Heritage Map of Bharat</p>
+            </div>
+        </div>
+
+        <div class="header-search">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="map-search" placeholder="Search Ajanta, Warli, Tanjore, Madhubani..." autocomplete="off">
+                <button id="clear-search" class="clear-btn" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="search-suggestions" class="search-suggestions"></div>
+        </div>
+
+        <div class="header-actions">
+            <button id="soundscape-btn" class="action-btn" title="Toggle Ambient Indian Classical Soundscape">
+                <i class="fa-solid fa-music"></i> <span class="btn-text">Audio Ambiance</span>
+                <span class="sound-wave-indicator"></span>
+            </button>
+            <button id="studio-btn" class="action-btn gold-glow" title="Open DIY Indian Art Canvas Studio">
+                <i class="fa-solid fa-palette"></i> <span class="btn-text">DIY Art Studio</span>
+            </button>
+            <button id="quiz-btn" class="action-btn" title="Take Art History Quiz">
+                <i class="fa-solid fa-graduation-cap"></i> <span class="btn-text">Art Quiz</span>
+            </button>
+            <button id="syllabus-btn" class="action-btn outline" title="View CO1 Syllabus Checklist">
+                <i class="fa-solid fa-list-check"></i> <span class="btn-text">CO1 Checklist</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="main-container">
+        
+        <!-- Left Floating Toolbar / Control Panel -->
+        <aside class="control-panel">
+            <div class="panel-section">
+                <h3><i class="fa-solid fa-filter"></i> Art Form Filter</h3>
+                <div class="filter-pills" id="category-filters">
+                    <button class="filter-pill active" data-category="all">
+                        <i class="fa-solid fa-border-all"></i> All Locations (<span id="count-all">8</span>)
+                    </button>
+                    <button class="filter-pill" data-category="mural">
+                        <i class="fa-solid fa-brush"></i> Cave & Wall Frescoes
+                    </button>
+                    <button class="filter-pill" data-category="sculpture">
+                        <i class="fa-solid fa-monument"></i> Monolithic & Temple Carvings
+                    </button>
+                    <button class="filter-pill" data-category="folk">
+                        <i class="fa-solid fa-hands-holding-circle"></i> Tribal & Folk Paintings
+                    </button>
+                    <button class="filter-pill" data-category="miniature">
+                        <i class="fa-solid fa-gem"></i> Gold & Court Miniatures
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3><i class="fa-solid fa-route"></i> Guided Art Trails</h3>
+                <div class="trail-buttons">
+                    <button class="trail-btn" data-trail="grand-tour">
+                        <div class="trail-icon"><i class="fa-solid fa-compass"></i></div>
+                        <div class="trail-info">
+                            <strong>Full CO1 Heritage Circuit</strong>
+                            <small>8 Essential Art Sites across Bharat</small>
+                        </div>
+                    </button>
+                    <button class="trail-btn" data-trail="tribal-trail">
+                        <div class="trail-icon"><i class="fa-solid fa-leaf"></i></div>
+                        <div class="trail-info">
+                            <strong>Folk & Tribal Canvas</strong>
+                            <small>Warli &bull; Madhubani &bull; Puri</small>
+                        </div>
+                    </button>
+                    <button class="trail-btn" data-trail="royal-sculptures">
+                        <div class="trail-icon"><i class="fa-solid fa-crown"></i></div>
+                        <div class="trail-info">
+                            <strong>Royal & Sacred Carvings</strong>
+                            <small>Ajanta &bull; Ellora &bull; Khajuraho &bull; Thanjavur</small>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3><i class="fa-solid fa-layer-group"></i> Map Canvas Style</h3>
+                <div class="layer-selector">
+                    <button class="layer-btn" data-layer="dark">
+                        <i class="fa-solid fa-moon"></i> Midnight Royal
+                    </button>
+                    <button class="layer-btn" data-layer="parchment">
+                        <i class="fa-solid fa-scroll"></i> Antique Parchment
+                    </button>
+                    <button class="layer-btn" data-layer="osm">
+                        <i class="fa-solid fa-map"></i> OpenStreetMap Classic
+                    </button>
+                    <button class="layer-btn active" data-layer="satellite">
+                        <i class="fa-solid fa-earth-asia"></i> Satellite View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Location Cards List -->
+            <div class="panel-section location-list-section">
+                <h3><i class="fa-solid fa-location-dot"></i> Key Locations (CO1 Syllabus)</h3>
+                <div class="location-cards-container" id="location-cards-list">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Leaflet Map Container -->
+        <main class="map-wrapper">
+            <div id="map"></div>
+
+            <!-- Map Floating Info / Legend -->
+            <div class="map-floating-legend">
+                <div class="legend-header">
+                    <span><i class="fa-solid fa-layer-group"></i> Map Legend</span>
+                    <button id="toggle-legend-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div class="legend-content" id="legend-body">
+                    <div class="legend-item"><span class="legend-color mural-color"></span> Cave Murals (Ajanta)</div>
+                    <div class="legend-item"><span class="legend-color sculpture-color"></span> Temple Carvings (Ellora, Khajuraho)</div>
+                    <div class="legend-item"><span class="legend-color miniature-color"></span> Tanjore & Miniature (Thanjavur, Jaipur)</div>
+                    <div class="legend-item"><span class="legend-color folk-color"></span> Folk & Tribal Art (Madhubani, Warli, Puri)</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Slide-in Glassmorphic Side Drawer / Detail Modal -->
+    <div id="detail-drawer" class="drawer-overlay">
+        <div class="drawer-content">
+            <button id="close-drawer" class="drawer-close-btn" aria-label="Close details"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="drawer-hero">
+                <img id="drawer-img" src="" alt="Art detail image">
+                <div class="drawer-hero-overlay">
+                    <span id="drawer-category-badge" class="badge"></span>
+                    <h2 id="drawer-title"></h2>
+                    <p id="drawer-location-sub"></p>
+                </div>
+            </div>
+
+            <div class="drawer-tabs">
+                <button class="drawer-tab active" data-tab="tab-overview"><i class="fa-solid fa-circle-info"></i> Overview</button>
+                <button class="drawer-tab" data-tab="tab-history"><i class="fa-solid fa-landmark"></i> History & Era</button>
+                <button class="drawer-tab" data-tab="tab-technique"><i class="fa-solid fa-paint-brush"></i> Technique & Colors</button>
+                <button class="drawer-tab" data-tab="tab-gallery"><i class="fa-solid fa-images"></i> Masterpieces</button>
+            </div>
+
+            <div class="drawer-body">
+                <!-- Audio Narrator Control Box -->
+                <div class="audio-narrator-box">
+                    <div class="narrator-info">
+                        <i class="fa-solid fa-volume-high narrator-icon"></i>
+                        <div>
+                            <strong>Audio Guide Narration</strong>
+                            <small id="narrator-status">Listen to historical breakdown</small>
+                        </div>
+                    </div>
+                    <div class="narrator-controls">
+                        <button id="play-narration-btn" class="narrator-play-btn"><i class="fa-solid fa-play"></i> Play Narration</button>
+                        <button id="stop-narration-btn" class="narrator-stop-btn" style="display:none;"><i class="fa-solid fa-square"></i> Stop</button>
+                    </div>
+                </div>
+
+                <!-- Tab 1: Overview -->
+                <div id="tab-overview" class="tab-panel active">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <div>
+                                <small>Historical Period</small>
+                                <strong id="meta-era"></strong>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-chess-king"></i>
+                            <div>
+                                <small>Dynasty / Patrons</small>
+                                <strong id="meta-dynasty"></strong>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-palette"></i>
+                            <div>
+                                <small>Medium & Pigments</small>
+                                <strong id="meta-medium"></strong>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-map-pin"></i>
+                            <div>
+                                <small>State / Region</small>
+                                <strong id="meta-state"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-block">
+                        <h3><i class="fa-solid fa-book-open"></i> Essential Art Description</h3>
+                        <p id="drawer-description"></p>
+                    </div>
+
+                    <div class="content-block key-features-box">
+                        <h3><i class="fa-solid fa-star"></i> Key Characteristics & Motifs</h3>
+                        <ul id="drawer-motifs-list"></ul>
+                    </div>
+
+                    <div class="drawer-action-row">
+                        <button id="launch-canvas-for-site" class="btn-primary gold-bg">
+                            <i class="fa-solid fa-paintbrush"></i> Practice Drawing in Canvas Studio
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab 2: History & Significance -->
+                <div id="tab-history" class="tab-panel">
+                    <div class="content-block">
+                        <h3><i class="fa-solid fa-hourglass-half"></i> Historical Background & Patronage</h3>
+                        <p id="drawer-history-text"></p>
+                    </div>
+
+                    <div class="content-block quote-box">
+                        <i class="fa-solid fa-quote-left quote-icon"></i>
+                        <blockquote id="drawer-quote"></blockquote>
+                        <cite id="drawer-quote-source"></cite>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Technique & Pigments -->
+                <div id="tab-technique" class="tab-panel">
+                    <div class="content-block">
+                        <h3><i class="fa-solid fa-mortar-pestle"></i> Artisanal Process & Pigments</h3>
+                        <p id="drawer-technique-text"></p>
+                    </div>
+                    <div class="color-palette-showcase">
+                        <h4>Traditional Color Palette Used:</h4>
+                        <div id="drawer-palette-chips" class="palette-chips"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Masterpiece Gallery -->
+                <div id="tab-gallery" class="tab-panel">
+                    <div class="gallery-grid" id="drawer-gallery-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DIY Art Canvas Studio Modal -->
+    <div id="studio-modal" class="modal-overlay">
+        <div class="modal-card canvas-studio-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-paintbrush"></i> Indian Folk Art DIY Studio</h2>
+                <button class="modal-close-btn" id="close-studio"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="studio-body">
+                <div class="studio-sidebar">
+                    <div class="studio-tool-group">
+                        <label><i class="fa-solid fa-layer-group"></i> Canvas Preset Style</label>
+                        <select id="canvas-preset-select">
+                            <option value="warli">Warli Terracotta Mud Canvas</option>
+                            <option value="madhubani">Madhubani Textured Rice Paper</option>
+                            <option value="tanjore">Tanjore Gold Crimson Board</option>
+                            <option value="parchment">Antique Manuscript Parchment</option>
+                        </select>
+                    </div>
+
+                    <div class="studio-tool-group">
+                        <label><i class="fa-solid fa-palette"></i> Traditional Color Palette</label>
+                        <div class="color-picker-grid" id="studio-color-picker">
+                            <button class="color-swatch active" data-color="#FFFFFF" style="background:#FFFFFF; border:1px solid #666;" title="Chalk White (Warli)"></button>
+                            <button class="color-swatch" data-color="#C0392B" style="background:#C0392B;" title="Kumkum Crimson Red"></button>
+                            <button class="color-swatch" data-color="#F39C12" style="background:#F39C12;" title="Haldi Turmeric Yellow"></button>
+                            <button class="color-swatch" data-color="#1B4F72" style="background:#1B4F72;" title="Neel Indigo Blue"></button>
+                            <button class="color-swatch" data-color="#D4AC0D" style="background:#D4AC0D;" title="Tanjore Gold"></button>
+                            <button class="color-swatch" data-color="#1E8449" style="background:#1E8449;" title="Emerald Green"></button>
+                            <button class="color-swatch" data-color="#17202A" style="background:#17202A;" title="Charcoal Black"></button>
+                        </div>
+                    </div>
+
+                    <div class="studio-tool-group">
+                        <label><i class="fa-solid fa-ruler-horizontal"></i> Brush Thickness: <span id="brush-size-val">3px</span></label>
+                        <input type="range" id="brush-size" min="1" max="25" value="3">
+                    </div>
+
+                    <div class="studio-tool-group">
+                        <label><i class="fa-solid fa-shapes"></i> Quick Stencil Stamp Motifs</label>
+                        <div class="stencil-btns">
+                            <button class="stencil-btn" data-stencil="warli-dancer" title="Stamp Warli Dancer"><i class="fa-solid fa-person-running"></i> Warli Dancer</button>
+                            <button class="stencil-btn" data-stencil="lotus" title="Stamp Sacred Lotus"><i class="fa-solid fa-spa"></i> Sacred Lotus</button>
+                            <button class="stencil-btn" data-stencil="peacock" title="Stamp Madhubani Peacock"><i class="fa-solid fa-feather-pointed"></i> Peacock</button>
+                            <button class="stencil-btn" data-stencil="sun" title="Stamp Solar Motif"><i class="fa-solid fa-sun"></i> Sun Motif</button>
+                        </div>
+                    </div>
+
+                    <div class="studio-tool-group actions">
+                        <button id="clear-canvas-btn" class="btn-secondary"><i class="fa-solid fa-trash-can"></i> Clear Canvas</button>
+                        <button id="download-canvas-btn" class="btn-primary gold-bg"><i class="fa-solid fa-download"></i> Save Artwork</button>
+                    </div>
+                </div>
+
+                <div class="studio-canvas-area">
+                    <canvas id="art-canvas" width="700" height="500"></canvas>
+                    <div class="canvas-instructions">
+                        <i class="fa-solid fa-lightbulb"></i> Tip: Select Warli canvas and White pigment to draw classic stick figures & Tarpa dance circles!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Art Quiz Modal -->
+    <div id="quiz-modal" class="modal-overlay">
+        <div class="modal-card quiz-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> Indian Art History Quiz (CO1)</h2>
+                <button class="modal-close-btn" id="close-quiz"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="quiz-body">
+                <div id="quiz-intro">
+                    <p>Test your understanding of Ajanta, Ellora, Tanjore, Khajuraho, Madhubani, Warli, Puri, and Jaipur art traditions!</p>
+                    <button id="start-quiz-btn" class="btn-primary gold-bg large-btn"><i class="fa-solid fa-play"></i> Start Quiz Challenge</button>
+                </div>
+
+                <div id="quiz-questions-wrapper" style="display:none;">
+                    <div class="quiz-progress-bar">
+                        <div id="quiz-progress-fill" style="width: 20%;"></div>
+                    </div>
+                    <div class="quiz-header-status">
+                        <span id="quiz-question-counter">Question 1 of 5</span>
+                        <span id="quiz-score-display">Score: 0</span>
+                    </div>
+
+                    <h3 id="quiz-question-text" class="quiz-q-text"></h3>
+                    <div id="quiz-options-grid" class="quiz-options"></div>
+
+                    <div id="quiz-explanation-box" class="quiz-explanation" style="display:none;"></div>
+
+                    <div class="quiz-nav">
+                        <button id="quiz-next-btn" class="btn-primary gold-bg" style="display:none;">Next Question <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <div id="quiz-results" style="display:none;" class="quiz-results-box">
+                    <div class="trophy-icon"><i class="fa-solid fa-award"></i></div>
+                    <h3>Quiz Completed!</h3>
+                    <p id="quiz-final-score-text"></p>
+                    <p id="quiz-badge-earned" class="badge-earned"></p>
+                    <button id="restart-quiz-btn" class="btn-secondary"><i class="fa-solid fa-rotate-right"></i> Retry Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Syllabus Checklist Modal -->
+    <div id="syllabus-modal" class="modal-overlay">
+        <div class="modal-card syllabus-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-list-check"></i> CO1 Syllabus Art Locations Checklist</h2>
+                <button class="modal-close-btn" id="close-syllabus"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="syllabus-body">
+                <p class="syllabus-intro">This interactive map satisfies all mandatory CO1 curriculum requirements by showcasing 8 premier Indian art & heritage locations with deep historical context, visual galleries, and artistic techniques.</p>
+                <div class="syllabus-table-wrapper">
+                    <table class="syllabus-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Art Form & Style</th>
+                                <th>State</th>
+                                <th>Key Masterpiece</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="syllabus-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
